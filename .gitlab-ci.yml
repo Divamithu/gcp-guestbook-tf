@@ -1,0 +1,66 @@
+image: 
+  name: hashicorp/terraform:0.11.14
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+stages:
+  - provision
+  - destroy
+
+before_script:
+  - terraform --version
+
+provision_dev:
+  stage: provision
+  script:
+    - cd environments/dev
+    - echo $DEV_GCP_CREDS > account.json
+    - terraform init
+    - terraform apply -input=false -auto-approve
+  when: manual
+
+provision_prod:
+  stage: provision
+  script:
+    - cd environments/prod
+    - echo $PROD_GCP_CREDS > account.json
+    - terraform init
+    - terraform apply -input=false -auto-approve
+  when: manual
+
+provision_uat:
+  stage: provision
+  script:
+    - cd environments/uat
+    - echo $UAT_GCP_CREDS > account.json
+    - terraform init
+    - terraform apply -input=false -auto-approve
+  when: manual
+
+destroy_dev:
+  stage: destroy
+  when: manual
+  script:
+    - cd environments/dev
+    - echo $DEV_GCP_CREDS > account.json
+    - terraform init
+    - terraform destroy -input=false -auto-approve
+ 
+destroy_prod:
+  stage: destroy
+  when: manual
+  script:
+    - cd environments/prod
+    - echo $PROD_GCP_CREDS > account.json
+    - terraform init
+    - terraform destroy -input=false -auto-approve
+
+destroy_uat:
+  stage: destroy
+  when: manual
+  script:
+    - cd environments/uat
+    - echo $UAT_GCP_CREDS > account.json
+    - terraform init
+    - terraform destroy -input=false -auto-approve
